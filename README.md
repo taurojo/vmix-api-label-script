@@ -25,7 +25,7 @@ The loop is paused for 50 milliseconds before repeating. If vMix is not running 
 ## Usage
 This script is useful for displaying useful information about a video clip in a live production, and can be further customized to fit the specific needs of each project.
 
-To use the script, simply copy the code into a VB script VMIX. And add, the GT Tittler to proyect whit the title: "TCPLAY". Or changue that title in the script.
+To use the script, simply copy the code into a VB script VMIX. And add, the GT Tittler (TCPLAY.gtzip) to proyect whit the title: "TCPLAY". Or changue that title in the script.
 Then, run the project and the video information should start displaying on the label and progress bar.
 
 
