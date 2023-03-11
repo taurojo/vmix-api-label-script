@@ -3,113 +3,144 @@
 ' --- and retrieves information to display on a label
 ' --- Designed for on-set viewing
 
-' --- Define variables to capture XML
-Dim apiUrl As String = "http://localhost:8088/API"
+    ' --- Define variables to capture XML
+Dim apiUrl As String = "http://10.207.10.235:8088/api"
 Dim webClient As New WebClient()
 Dim xmlString As String = ""
 
-' --- Define variables
+  
+
+    ' --- Define variables
+
 Dim position As Integer
 Dim positionTC As String
 Dim duration As Integer
 Dim durationTC As String
 Dim remainTC As String
+ 
 
-' --- Prepare the bar
-Dim maxCharacters As Integer = 124
-Dim barCharacters As Integer
+    ' --- Prepare the barprogress
 
-' --- Default bar colors
-Dim backgroundColor As String = "#40B0FF" ' name="barra.Fill.Color"
-Dim barBackgroundColor As String ="#0043C8C2" 'name="FondoBarra.Fill.Color">
+Dim numeromaxCaracteres As Integer = 124
+Dim caracteresBarra As Integer
+ 
 
-' --- Bar colors at 15 seconds
-Dim firstTime As Integer = 15
-Dim firstBackgroundColor As String ="#a88927" 'name="barra.Fill.Color">
-Dim firstBarBackgroundColor As String ="#594813" 'name="FondoBarra.Fill.Color">
+    ' --- Default bar colors
 
-' --- Bar colors at 10 seconds
-Dim lastTime As Integer = 10
-Dim lastBackgroundColor As String ="#b83f32" 'name="barra.Fill.Color">
-Dim lastBarBackgroundColor As String ="#70261e" 'name="FondoBarra.Fill.Color">
+Dim colorFondo As String = "#40B0FF" ' name="barra.Fill.Color"
+Dim colorFondoBarra As String ="#0043C8C2" 'name="FondoBarra.Fill.Color">
 
-' --- Launch the loop, include a sleep to pause it
+
+    ' --- Bar colors at 15 seconds
+
+Dim tiempoPrimero As Integer = 15
+Dim colorFondoPrimero As String ="#a88927" 'name="barra.Fill.Color">
+Dim colorFondoBarraPrimero As String ="#594813" 'name="FondoBarra.Fill.Color">
+
+ 
+
+    ' --- Bar colors at 10 seconds
+
+Dim tiempoUltimo As Integer = 10
+Dim colorFondoUltimo  As String ="#b83f32" 'name="barra.Fill.Color">
+Dim colorFondoBarraUltimo  As String ="#70261e" 'name="FondoBarra.Fill.Color">
+
+ 
+
+  ' --- Launch the loop, include a sleep to pause it
+ 
 
 Do While true
 
-xmlString = webClient.DownloadString(apiUrl)
-Dim xmlDoc As New XmlDocument()
 
-' --- Launch the loop, include a sleep to pause it
-If xmlDoc.TryParse(xmlString, Nothing) Then
-' The XML is valid
-xmlDoc.LoadXml(xmlString)
+    xmlString = webClient.DownloadString(apiUrl)
+    Dim xmlDoc As New XmlDocument()
+    xmlDoc.LoadXml(xmlString)
+    Dim activeNode As XmlNode = xmlDoc.SelectSingleNode("//active")
+    Dim activeValue As String = activeNode.InnerText
 
-Dim activeNode As XmlNode = xmlDoc.SelectSingleNode("//active")
-Dim activeValue As String = activeNode.InnerText
 
-' --- Retrieve the active line's Title values
-Dim inputNode As Xml.XmlNode = xmlDoc.SelectSingleNode("/vmix/inputs/input[@number='" +activeValue + "']")
-If inputNode IsNot Nothing Then
 
-' -- Title
-Dim shortTitle As String = inputNode.Attributes("shortTitle").Value
+        ' --- Retrieve the active line's 
 
-' -- Durations
-position = Integer.Parse(inputNode.Attributes("position").Value)
-duration = Integer.Parse( inputNode.Attributes("duration").Value)
+    Dim inputNode As Xml.XmlNode = xmlDoc.SelectSingleNode("/vmix/inputs/input[@number='" +activeValue + "']")
+    If inputNode IsNot Nothing Then
 
-' -- Convert from seconds to TC
+ 
 
-' position
-Dim tspostion As TimeSpan = TimeSpan.FromMilliseconds(position)
-Dim mydate As DateTime = New DateTime(tspostion.Ticks)
-positionTC = mydate.ToString("HH:mm:ss")
+        ' -- Title
 
-' duration
-Dim ts As TimeSpan = TimeSpan.FromMilliseconds(duration )
-Dim mydatepostion As DateTime = New DateTime(ts.Ticks)
-durationTC = mydatepostion.ToString("HH:mm:ss")
+    Dim shortTitle As String = inputNode.Attributes("shortTitle").Value
 
-' remain
-Dim tsremain As TimeSpan = TimeSpan.FromMilliseconds(duration - position)
-Dim mydateremain As DateTime = New DateTime(tsremain .Ticks)
-remainTC = mydateremain .ToString("HH:mm:ss")
 
-'Mark the text:
-API.Function("SetText",Input:="TCPLAY",SelectedName:="NOMBRE.Text" ,Value:=""+ shortTitle + "")
-API.Function("SetText",Input:="TCPLAY",SelectedName:="DURACIONES.Text" ,Value:="" + positionTC +" / " + remainTC +" / " + durationTC + "")
+        ' -- Durations  
 
-'Prepare the bar. Arial 20
+    position = Integer.Parse(inputNode.Attributes("position").Value)
+    duration = Integer.Parse( inputNode.Attributes("duration").Value)
 
-charactersInBar = (position * maxCharacters) / duration
-Dim charactersToPrintBar As New String("."c, charactersInBar)
-API.Function("SetText", Input:="TCPLAY", SelectedName:="barText.Text", Value:="" + charactersToPrintBar + "")
+        ' -- Convert from seconds to TC
 
-'Define bar colors.
+        ' position
 
-' Default color
-API.Function("SetColor", Input:="TCPLAY", SelectedName:="bar.Fill.Color", Value:=""+ backgroundColor + "")
-API.Function("SetColor", Input:="TCPLAY", SelectedName:="BarBackground.Fill.Color", Value:=""+ barBackgroundColor + "")
+    Dim tspostion As TimeSpan = TimeSpan.FromMilliseconds(position)
+    Dim mydate As DateTime = New DateTime(tspostion.Ticks)
+    positionTC = mydate.ToString("HH:mm:ss")
 
-' Color for the first section
-If tsremain.TotalSeconds < firstSectionTime Then
-    API.Function("SetColor", Input:="TCPLAY", SelectedName:="bar.Fill.Color", Value:=""+ firstSectionBackgroundColor +"")
-    API.Function("SetColor", Input:="TCPLAY", SelectedName:="BarBackground.Fill.Color", Value:=""+ firstSectionBarBackgroundColor +"")
+
+        ' duration
+
+    Dim ts As TimeSpan = TimeSpan.FromMilliseconds(duration )
+    Dim mydatepostion As DateTime = New DateTime(ts.Ticks)
+    durationTC = mydatepostion.ToString("HH:mm:ss")
+
+        ' remain
+
+    Dim tsremain  As TimeSpan = TimeSpan.FromMilliseconds(duration - position)
+    Dim mydateremain  As DateTime = New DateTime(tsremain .Ticks)
+    remainTC = mydateremain .ToString("HH:mm:ss")
+
+        'Mark the text:
+
+    API.Function("SetText",Input:="TCPLAY_realizacion",SelectedName:="NOMBRE.Text" ,Value:=""+ shortTitle + "")
+    API.Function("SetText",Input:="TCPLAY_realizacion",SelectedName:="DURACIONES.Text" ,Value:="" + positionTC +" / " + remainTC +" / " + durationTC + "")
+
+ 
+
+        'Preparamos la barra. Dots in Arial 20
+
+    caracteresBarra = (position * numeromaxCaracteres)  / duration
+    Dim caracteresaImprimirBarra  As New String("."c, caracteresBarra)
+    API.Function("SetText",Input:="TCPLAY_realizacion",SelectedName:="barraTexto.Text" ,Value:="" + caracteresaImprimirBarra  + "")
+
+ 
+
+        'Define bar colors.
+
+        'Default color
+
+    API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="barra.Fill.Color",Value:=""+ colorFondo +"")
+    API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarra +"")
+
+ 
+        ' Color for the 15 seconds remain
+
+    If tsremain.TotalSeconds < tiempoPrimero Then
+        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoPrimero +"")
+        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraPrimero +"")
+    End If
+
+ 
+
+        ' Color for the 15 seconds remain
+
+    If tsremain.TotalSeconds < tiempoUltimo Then
+        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoUltimo +"")
+        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraUltimo +"")
+    End If
+
+                                            
 End If
 
-' Color for the last section
-If tsremain.TotalSeconds < lastSectionTime Then
-    API.Function("SetColor", Input:="TCPLAY", SelectedName:="bar.Fill.Color", Value:=""+ lastSectionBackgroundColor +"")
-    API.Function("SetColor", Input:="TCPLAY", SelectedName:="BarBackground.Fill.Color", Value:=""+ lastSectionBarBackgroundColor +"")
-End If
-
-End If
 Sleep(50)
 
-Else
-    ' Invalid XML
-    Console.WriteLine("Invalid XML.")
-End If
-
-Loop
+loop                  
