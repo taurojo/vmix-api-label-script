@@ -33,3 +33,10 @@ _Change Vmix IP read API:_
 ```sh
 Dim apiUrl As String = "http://localhost:8088/API"
 ```
+
+_If not localhost change sleep time:_
+```sh
+sleep(200)
+```
+
+
