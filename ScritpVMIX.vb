@@ -4,7 +4,7 @@
 ' --- Designed for on-set viewing
 
     ' --- Define variables to capture XML
-Dim apiUrl As String = "http://10.207.10.235:8088/api"
+Dim apiUrl As String = "http://127.0.0.1:8088/api"
 Dim webClient As New WebClient()
 Dim xmlString As String = ""
 
@@ -23,6 +23,11 @@ Dim remainTC As String
 
 Dim numeromaxCaracteres As Integer = 124
 Dim caracteresBarra As Integer
+ 
+    ' --- Hidden bar colors
+
+Dim colorFondoHidden As String = "#40B0FF00" ' name="barra.Fill.Color"
+Dim colorFondoBarraHidden As String ="#0043C800" 'name="FondoBarra.Fill.Color">
  
 
     ' --- Default bar colors
@@ -78,69 +83,81 @@ Do While true
     position = Integer.Parse(inputNode.Attributes("position").Value)
     duration = Integer.Parse( inputNode.Attributes("duration").Value)
 
-        ' -- Convert from seconds to TC
+	If duration=0 Then
+			' -- Hide TC display completely
+		API.Function("SetText",Input:="TCPLAY",SelectedName:="NOMBRE.Text" ,Value:="")
+		API.Function("SetText",Input:="TCPLAY",SelectedName:="DURACIONES.Text" ,Value:="")
+		API.Function("SetText",Input:="TCPLAY",SelectedName:="barraTexto.Text" ,Value:="")
 
-        ' position
+		API.Function("SetColor",Input:="TCPLAY",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoHidden +"")
+		API.Function("SetColor",Input:="TCPLAY",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraHidden +"")
+		 
+	Else
 
-    Dim tspostion As TimeSpan = TimeSpan.FromMilliseconds(position)
-    Dim mydate As DateTime = New DateTime(tspostion.Ticks)
-    positionTC = mydate.ToString("HH:mm:ss")
+			' -- Convert from seconds to TC
+
+			' position
+
+		Dim tspostion As TimeSpan = TimeSpan.FromMilliseconds(position)
+		Dim mydate As DateTime = New DateTime(tspostion.Ticks)
+		positionTC = mydate.ToString("HH:mm:ss")
 
 
-        ' duration
+			' duration
 
-    Dim ts As TimeSpan = TimeSpan.FromMilliseconds(duration )
-    Dim mydatepostion As DateTime = New DateTime(ts.Ticks)
-    durationTC = mydatepostion.ToString("HH:mm:ss")
+		Dim ts As TimeSpan = TimeSpan.FromMilliseconds(duration )
+		Dim mydatepostion As DateTime = New DateTime(ts.Ticks)
+		durationTC = mydatepostion.ToString("HH:mm:ss")
 
-        ' remain
+			' remain
 
-    Dim tsremain  As TimeSpan = TimeSpan.FromMilliseconds(duration - position)
-    Dim mydateremain  As DateTime = New DateTime(tsremain .Ticks)
-    remainTC = mydateremain .ToString("HH:mm:ss")
+		Dim tsremain  As TimeSpan = TimeSpan.FromMilliseconds(duration - position)
+		Dim mydateremain  As DateTime = New DateTime(tsremain .Ticks)
+		remainTC = mydateremain .ToString("HH:mm:ss")
 
-        'Mark the text:
+			'Mark the text:
 
-    API.Function("SetText",Input:="TCPLAY_realizacion",SelectedName:="NOMBRE.Text" ,Value:=""+ shortTitle + "")
-    API.Function("SetText",Input:="TCPLAY_realizacion",SelectedName:="DURACIONES.Text" ,Value:="" + positionTC +" / " + remainTC +" / " + durationTC + "")
+		API.Function("SetText",Input:="TCPLAY",SelectedName:="NOMBRE.Text" ,Value:=""+ shortTitle + "")
+		API.Function("SetText",Input:="TCPLAY",SelectedName:="DURACIONES.Text" ,Value:="" + positionTC +" / " + durationTC +" / " + remainTC + "")
 
- 
+	 
 
-        'Preparamos la barra. Dots in Arial 20
+			'Preparamos la barra. Dots in Arial 20
 
-    caracteresBarra = (position * numeromaxCaracteres)  / duration
-    Dim caracteresaImprimirBarra  As New String("."c, caracteresBarra)
-    API.Function("SetText",Input:="TCPLAY_realizacion",SelectedName:="barraTexto.Text" ,Value:="" + caracteresaImprimirBarra  + "")
+		caracteresBarra = (position * numeromaxCaracteres)  / duration
+		Dim caracteresaImprimirBarra  As New String("."c, caracteresBarra)
+		API.Function("SetText",Input:="TCPLAY",SelectedName:="barraTexto.Text" ,Value:="" + caracteresaImprimirBarra  + "")
 
- 
+	 
 
-        'Define bar colors.
+			'Define bar colors.
 
-        'Default color
+			'Default color
 
-    API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="barra.Fill.Color",Value:=""+ colorFondo +"")
-    API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarra +"")
+		API.Function("SetColor",Input:="TCPLAY",SelectedName:="barra.Fill.Color",Value:=""+ colorFondo +"")
+		API.Function("SetColor",Input:="TCPLAY",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarra +"")
 
- 
-        ' Color for the 15 seconds remain
+	 
+			' Color for the 15 seconds remain
 
-    If tsremain.TotalSeconds < tiempoPrimero Then
-        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoPrimero +"")
-        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraPrimero +"")
-    End If
+		If tsremain.TotalSeconds < tiempoPrimero Then
+			API.Function("SetColor",Input:="TCPLAY",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoPrimero +"")
+			API.Function("SetColor",Input:="TCPLAY",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraPrimero +"")
+		End If
 
- 
+	 
 
-        ' Color for the 15 seconds remain
+			' Color for the 15 seconds remain
 
-    If tsremain.TotalSeconds < tiempoUltimo Then
-        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoUltimo +"")
-        API.Function("SetColor",Input:="TCPLAY_realizacion",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraUltimo +"")
-    End If
+		If tsremain.TotalSeconds < tiempoUltimo Then
+			API.Function("SetColor",Input:="TCPLAY",SelectedName:="barra.Fill.Color",Value:=""+ colorFondoUltimo +"")
+			API.Function("SetColor",Input:="TCPLAY",SelectedName:="FondoBarra.Fill.Color",Value:=""+ colorFondoBarraUltimo +"")
+		End If
+	End If
 
                                             
 End If
 
-Sleep(50)
+Sleep(500)
 
 loop                  
